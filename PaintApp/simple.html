@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Paint Simple</title>
+        <meta charset="utf-8"/>
+        <script src="https://code.jquery.com/jquery-3.0.0.min.js"/></script>
+        <style rel="text/css">
+            canvas {border: 1px solid red; margin: 10px auto;}
+        </style>
+    </head>
+    <body>
+        <canvas id="board"></canvas>
+        <br />
+        
+        
+        <script lang="javascript">
+            // Create canvas element
+            var canvas = document.getElementById('board');
+            canvas.width = 500;
+            canvas.height = 400;
+            var context = canvas.getContext('2d');
+            
+            // Properties for app
+            var clickX = new Array(); // array x coordinates
+            var clickY = new Array(); // array y coordinates
+            var clickDrag = new Array(); // array is drag
+            var paint = false;
+            
+            $('#board').mousedown(function(e) {
+                // determine x and y mouse
+                mouseX = e.pageX - this.offsetLeft;
+                mouseY = e.pageY - this.offsetTop;
+                // is paint
+                paint = true;
+                // add x, y and not drag
+                addClick(mouseX, mouseY, false);
+                reDraw();    
+            });
+            
+            $('#board').mousemove(function(e) {
+                // if is paint then add x, y and is dragging
+                if(paint) {
+                    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+                    // repaint all canvas
+                    reDraw();
+                }
+            });
+            
+            $('#board').mouseup(function(e) {
+                paint = false;
+            });
+            $('#board').mouseleave(function(e) {
+                paint = false;
+            });
+            
+            function addClick(x, y, dragging) {
+                clickX.push(x);
+                clickY.push(y);
+                clickDrag.push(dragging);
+            }
+            
+            function refresh() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            function clearBoard() {
+                refresh();
+                clickX = new Array();
+                clickY = new Array();
+                clickDrag = new Array();
+            }
+            
+            function reDraw() {
+                refresh();
+                //sets or returns the type of corner created, when two lines meet.
+                context.lineJoin = "round";
+        		context.lineWidth = 5;
+                context.strokeStyle = "#43A2CA";
+                for(var i = 0; i < clickX.length; i++) {
+        		context.beginPath();
+        		if(clickDrag[i]){
+        			context.moveTo(clickX[i-1], clickY[i-1]);
+        		}else{
+        			context.moveTo(clickX[i] - 1, clickY[i]);
+        		}
+        		context.lineTo(clickX[i], clickY[i]);
+        		context.closePath();
+        		context.stroke();
+                }
+            }
+        </script>
+        
+        <button onclick="clearBoard();">Clear</button>
+    </body>
+</html>

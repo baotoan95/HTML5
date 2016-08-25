@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Demo</title>
+        <script>
+            var bgCanvas, bgContext, bgImg;
+            var eagleBird;
+            
+            var loadCount = 0;
+            
+            function Bird(srcUrl) {
+                this.m_frameId = 0; // frame hiện tại
+                this.m_frames = 28; // tổng số frames
+                
+                this.m_x = 0; // tọa độ x
+                this.m_y = 0; // tọa độ y
+                this.m_width = 250; // độ rộng của chim
+                this.m_height = 222; // độ dài của chim :3
+                
+                this.m_img = new Image();
+                this.m_img.src = srcUrl; // đường dẫn đến hình
+                this.m_img.onload = function() {loadCount++;}
+                
+                this.m_eagleCanvas = document.getElementById("eagleCanvasId");
+                this.m_eagleContext = this.m_eagleCanvas.getContext("2d");
+            }
+            
+            Bird.prototype.update = function() {
+                this.m_frameId++;
+                this.m_frameId = this.m_frameId % this.m_frames; // nếu frameId là frame cuối thì quay lại frame 0
+            }
+            
+            Bird.prototype.draw = function() {
+                this.m_eagleCanvas.width = this.m_eagleCanvas.width;
+                /*
+                    img: ảnh
+                    sx: tọa độ x điểm bắt đầu cắt
+                    sy: tọa độ y điểm bắt đầu cắt
+                    swidth: chiều rộng ảnh đc cắt
+                    sheight: chiều cao ảnh đc cắt
+                    x: tọa độ đặt ảnh trên canvas
+                    y: tọa độ đặt ảnh trên canvas
+                    width: chiều rộng của ảnh
+                    height: chiều cao của ảnh
+                */
+                this.m_eagleContext.drawImage(this.m_img,
+                    this.m_frameId * this.m_width, 0,
+                    this.m_width, this.m_height,
+                    this.m_x, this.m_y, this.m_width, this.m_height);
+            }
+            
+            function init() {
+                bgCanvas = document.getElementById("bgCanvasId");
+                bgContext = bgCanvas.getContext("2d");
+                
+                bgImg = new Image();
+                bgImg.src = "images/background.jpg";
+                bgImg.onload = function() {loadCount++;};
+                
+                eagleBird = new Bird("images/bird.png");
+                
+                setInterval(run, 1000.0/60);
+            }
+            
+            function run() {
+                if(loadCount == 2) {
+                    update();
+                    draw();
+                }
+            }
+            
+            function update() {
+                eagleBird.update();
+            }
+            
+            function draw() {
+                bgCanvas.width = bgCanvas.width;
+                bgContext.drawImage(bgImg, 0, 0);
+                
+                eagleBird.draw();
+            }
+        </script>
+    </head>
+    <body onload="init()">
+        <canvas id="bgCanvasId" width="730" height="335" style="position:absolute;z-index:-1"></canvas>
+        <canvas id="eagleCanvasId" width="730" height="335"></canvas>
+    </body>
+</html>
